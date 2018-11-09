@@ -1,6 +1,28 @@
 <?php
+$sites = [];
 
-var_dump($_GET);
+if (isset($_GET)){
+    $data = $_GET;
+}
+
+if (!empty($data['siteNames'])) {
+    foreach ($data['siteNames'] as $siteName) {
+        if (!empty($siteName)) {
+            $sites[] = $siteName;
+        }
+    }
+}
+$visitArray = ['visit', 'posetit', 'visit-posetit'];
+$visit = 'visit';
+$timeArray = ['day', 'week', 'month'];
+$time = 'day';
+if (!empty($data['visit']) && in_array( $data['visit'], $visitArray)) {
+    $visit = $data['visit'];
+}
+if (!empty($data['time']) && in_array( $data['time'], $timeArray)) {
+    $visit = $data['visit'];
+}
+
 ?>
 
 <html lang="en">
@@ -14,11 +36,11 @@ var_dump($_GET);
     <title>Счетчик</title></head>
 <body>
 <div class="container"><h1 class="first-title">Статистика от LiveInternet в динамике</h1>
-    <form class="my-form" method="GET">
+    <form id="form" class="my-form" method="GET" action="">
         <div class="sites">
             <div class="add-del-site">
                 <div class="input-group mb-3">
-                    <div class="input-group-prepend"><span class="input-group-text" id="basic-addon3">https://</span>
+                    <div class="input-group-prepend"><span class="input-group-text" id="basic-addon3">http://</span>
                     </div>
                     <input class="form-control" value="" type="text" id="basic-url"/></div>
                 <div class="buttons">
@@ -27,35 +49,51 @@ var_dump($_GET);
             </div>
             <ul class="site_list list-group">
                 <li class="clone list-group-item">
-                    <a class="list-group-item-url" href="">lorem</a>
+                    <input type="hidden" name="siteNames[]" value="">
+                    <a class="list-group-item-url" target="_blank" href="">lorem</a>
                     <button type="button" class="delete-button btn btn-outline-primary">Удалить</button>
                 </li>
+                <?php
+                foreach ($sites as $key => $val) {
+                    ?>
+                    <li class='list-group-item'>
+                        <input type='hidden' name='siteNames[]' value='<?= $val ?>'>
+                        <a class='list-group-item-item' target='_blank' href=''> <?= $val ?> </a>
+                        <button type='button' class='delete-button btn btn-outline-primary'>Удалить</button>
+                    </li>
+                <?php
+                }
+                ?>
+
             </ul>
         </div>
         <div class="options"><span class="opt-text">Показать динамику количества</span>
-            <div class="dropdown">
-                <button class=" btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">поситителей
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <li class="dropdown-item">визитов</li>
-                    <li class="dropdown-item">визитов на поситителей</li>
-                </ul>
-            </div>
+            <select class="custom-select" name="visit">
+                <option value="posetit">Посетителей</option>
+                <option value="visit">визитов</option>
+                <option value="visitPosetit">визитов на посетителей</option>
+            </select>
             <span class="opt-text">по</span>
-            <div class="dropdown">
-                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">дням
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><a class="dropdown-item" href="#">неделям</a><a
-                        class="dropdown-item" href="#">месяцам</a></div>
-            </div>
-            <button class="btn btn-outline-primary" type="submit">посмотреть</button>
+            <select class="custom-select" name="time">
+                <option value="day">дням</option>
+                <option value="week">неделям</option>
+                <option value="month">месяцам</option>
+            </select>
+            <button id="submit" class="btn btn-outline-primary" type="submit">посмотреть</button>
         </div>
     </form>
 </div>
 <script src="scripts/jquery-3.3.1.min.js"></script>
+<script src="scripts/bootstrap.bundle.min.js"></script>
 <script src="scripts/script.js"></script>
 </body>
 </html>
 
+
+/*
+таблица в бд:
+
+id (primary key) , url (string), date_create (timestamp) , date_get_data (timestamp)
+php pdo
+
+*/
