@@ -13,4 +13,4 @@ General::init($DB, $SMARTY);
 require_once '../controller/SiteController.php';
 require_once '../controller/ParserController.php';
 
-ParserController::getSitesData();
+ParserController::loadSitesData();

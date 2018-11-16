@@ -13,15 +13,22 @@ class ParserController{
         $this->_smarty = General::getSmarty();
     }
 
-    public static function getSitesData()
+    public static function loadSitesData()
     {
         $sites = Site::getSites();
         $parser = new Parser();
         foreach ($sites as $site) {
-            $siteData = $parser->getSiteData($site);
-            var_dump($site, $siteData);
+            $site->getSiteData(); //заполнили старые данные
+            $parser->loadSiteData($site); //загружаем и сохраняем новые
         }
-        echo 'ok';
 
+        echo 'ok';
     }
+
+    public static function loadSiteData($site)
+    {
+        $parser = new Parser();
+        $parser->loadSiteData($site);
+    }
+
 }

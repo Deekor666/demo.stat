@@ -27,9 +27,8 @@ class SiteController
     {
         $sitesList = [];
 
-        if (isset($_GET)){
-            $data = $_GET;
-        }
+
+        $data = $_GET;
 
         if (!empty($data['siteNames'])) {
             foreach ($data['siteNames'] as $siteName) {
@@ -38,20 +37,37 @@ class SiteController
                 }
             }
         }
+        var_dump($sitesList);
+        foreach ($sitesList as $item) {
+            $findHttp = preg_match('|^http?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $item);
+            $findHttps = preg_match('|^https?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $item);
+            if ($findHttp === 1 && $findHttps === 0){
+                var_dump(mb_strcut($item, 0, 7));
+            } else {
+                var_dump('1234');
+            }
+        }
+
         $prosmotrArray = ['prosmotr', 'posetit', 'prosmotr-posetit'];
         $prosmotr = 'prosmotr';
         $timeArray = ['day', 'week', 'month'];
         $time = 'day';
-        if (!empty($data['prosmotr']) && in_array( $data['prosmotr'], $prosmotrArray)) {
+        if (!empty($data['prosmotr']) && in_array($data['prosmotr'], $prosmotrArray)) {
             $prosmotr = $data['prosmotr'];
         }
-        if (!empty($data['time']) && in_array( $data['time'], $timeArray)) {
+        if (!empty($data['time']) && in_array($data['time'], $timeArray)) {
             $prosmotr = $data['prosmotr'];
         }
         $sites = [];
 
         foreach ($sitesList as $item) {
-            $sites[] = new Site($item);
+            $site = new Site($item);
+            $site->getSiteData();
+            if (empty($site->data)) {
+                ParserController::loadSiteData($site);
+                $site->getSiteData();
+            }
+            $sites[] = $site;
         }
 
         $this->_smarty->assign('sites', $sites);
@@ -60,9 +76,7 @@ class SiteController
 
     public function actionParsing()
     {
-        ParserController::getSitesData();
+        ParserController::loadSitesData();
     }
-
-
 
 }

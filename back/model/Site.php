@@ -30,33 +30,27 @@ class Site
 
     public function save()
     {
+
         $stmt = $this->_db->prepare('INSERT INTO sites SET url = :url');
         $stmt->execute([':url' => $this->url]);
         $site = self::getSiteByUrl($this->url);
         return $site;
     }
 
-    public function getData()
+    /**
+     * Метод заберет статистику из базы данных и заполнит в модель ->data
+     * return null
+     */
+    public function getSiteData()
     {
-
-        $stmt = $this->_db->prepare('SELECT "site_id", "date" FROM sites_data ');
-        $stmt->execute();
+        $stmt = $this->_db->prepare('SELECT site_id, `date`, prosmotr, posetit FROM sites_data WHERE site_id = :site_id');
+        $stmt->execute([':site_id' => $this->id]);
         $siteData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        var_dump($siteData);
-        $this->data = [];           //передаём полученный массив
-
-
-        /*
-         * получи данные из таблицы с данными (о, тафтология) и заполни их в модели
-         * их базы прям. не из парсера твоего нужного всем.
-         * Попал в просак
-         *
-         * Такими темпами будешь вникать. Скоро погрузишься в портал и кончится твоя стажировка
-         *
-         * В смысле хорошо идешь, мне нравится)
-         * Затупы твои это вообще не затупы.
-         *
-        */
+        $data = [];
+        foreach ($siteData as $qData) {
+            $data[$qData['date']] = ['prosmotr' => $qData['prosmotr'], 'posetit' => $qData['posetit']];
+        }
+        $this->data = $data;
     }
 
     public static function getSiteByUrl($url)

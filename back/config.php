@@ -12,3 +12,4 @@ $opt = [
     PDO::ATTR_EMULATE_PREPARES   => false,
 ];
 $DB = new PDO($dsn, $user, $pass, $opt);
+

@@ -97,3 +97,7 @@ body{
 .my-form{
     width: 100%;
 }
+
+#chart_div {
+    width: 1000px;
+}

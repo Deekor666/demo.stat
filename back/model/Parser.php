@@ -20,7 +20,7 @@ class Parser
          */
     }
 
-    public function getSiteData($site)
+    public function loadSiteData($site)
     {
         //$site->url
         $handle = fopen("http://parser/test.csv", "rd");
@@ -46,10 +46,12 @@ class Parser
             $months[] = $arrDate[1];
         }
         $finalDate = $this->_correctDate($months, $days);
+        $resultData = [];
         foreach ($data as $i => $item) {
             $data[$i]['date'] = $finalDate[$i];
+            $resultData[$finalDate[$i]] = ['prosmotr' => $data[$i]['prosmotr'], 'posetit' => $data[$i]['posetit']];
         }
-        $this->saveSiteData($data);
+        $this->saveSiteData($resultData, $site);
     }
 
     private function _correctDate($months, $days)
@@ -79,18 +81,18 @@ class Parser
         return $finalDate;
     }
 
-//    private function qweqwe(){
-//        $test = ['01' => '12', '02'=>'12', '03'=>'12', '04'=>'12', '10' => '01', '12'=>'01', '13'=>'01','14'=>'01'];
-//        $year = $this->_correctYear($test);
-//        return $year;
-//
-//    }
-
-    private function saveSiteData($data)
+    private function saveSiteData($data, $site)
     {
-        foreach ($data as $item) {
-            $stmt = $this->_db->prepare('INSERT INTO sites_data (site_id, `date`, prosmotr, posetit) VALUES (? , ? , ?, ?)');
-            $stmt->execute([$item['site_id'], $item['date'], $item['prosmotr'], $item['posetit']]);
+        foreach ($data as $key => $item) {
+            if (isset($site->data[$key])) {
+                if ($item['prosmotr'] > $site->data[$key]['prosmotr'] || $item['posetit'] > $site->data[$key]['posetit']) {
+                    $stmt = $this->_db->prepare('UPDATE sites_data SET prosmotr = ?, posetit = ? WHERE site_id = ? AND `date` = ?');
+                    $stmt->execute([$item['prosmotr'], $item['posetit'], $site->id, $key]);
+                }
+            } else {
+                $stmt = $this->_db->prepare('INSERT INTO sites_data (site_id, `date`, prosmotr, posetit) VALUES (? , ? , ?, ?)');
+                $stmt->execute([$site->id, $key, $item['prosmotr'], $item['posetit']]);
+            }
         }
     }
 

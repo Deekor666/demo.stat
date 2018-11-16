@@ -4,6 +4,9 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+
+
+
     <link rel="stylesheet" href="../styles/bootstrap.min.css"/>
     <link rel="stylesheet" href="../styles/style.css"/>
     <title>Счетчик</title></head>
@@ -50,9 +53,13 @@
             <button id="submit" class="btn btn-outline-primary" type="submit">посмотреть</button>
         </div>
     </form>
+    <div id="chart_div"></div>
+
 </div>
+<script type="text/javascript" src="../scripts/loader.js"></script>
 <script src="../scripts/jquery-3.3.1.min.js"></script>
 <script src="../scripts/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="../scripts/chart.js"></script>
 <script src="../scripts/script.js"></script>
 </body>
 </html>
