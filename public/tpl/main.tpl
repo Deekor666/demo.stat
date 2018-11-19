@@ -59,7 +59,6 @@
 <script type="text/javascript" src="../scripts/loader.js"></script>
 <script src="../scripts/jquery-3.3.1.min.js"></script>
 <script src="../scripts/bootstrap.bundle.min.js"></script>
-<script type="text/javascript" src="../scripts/chart.js"></script>
 <script src="../scripts/script.js"></script>
 </body>
 </html>

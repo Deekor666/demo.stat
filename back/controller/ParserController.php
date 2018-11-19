@@ -25,6 +25,9 @@ class ParserController{
         echo 'ok';
     }
 
+    /**
+     * функция, которую запускает крон
+     */
     public static function loadSiteData($site)
     {
         $parser = new Parser();

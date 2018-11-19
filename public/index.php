@@ -17,6 +17,10 @@ if (!empty($_GET['act'])) {
     $act = $_GET['act'];
 }
 
+/**
+ * при входе на сайт, запуск Сайт Контроллера
+ */
+
 if ($act === 'site') {
     new SiteController();
 }

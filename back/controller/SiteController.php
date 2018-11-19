@@ -7,6 +7,12 @@ class SiteController
 
     private $_smarty;
 
+    /**
+     * SiteController constructor.
+     * в конструкте запуск функции actionIndex
+     * или actionParsing
+     */
+
     public function __construct()
     {
         $this->_smarty = General::getSmarty();
@@ -27,6 +33,9 @@ class SiteController
     {
         $sitesList = [];
 
+        /**
+         * получение формы
+         */
 
         $data = $_GET;
 
@@ -37,17 +46,52 @@ class SiteController
                 }
             }
         }
+
+        /**
+         *
+         * - определяешь есть ли http/s +
+         * - если есть - обрезаем. Тебе не привыкать. Если нет - ну и +
+         * - Дальше бьем оставшуюся строку по точкам. +
+         * - обхявлем переменную строковую в которую будем лепить урл +
+         * - Если первый элемент массива www - добавляем к строке
+         * - если не www - добавляем прост элемент
+         * - проходим массив по точками пока не встетим что-то вроде ru/com/net
+         * - Обязательные условия для того, что признать урл валидным:
+         *     -ru/com/net должен встретиться и присутствовать в строке
+         *     -нужно чтобы тело урла содержало как минимум одну запись (не учитывая www)
+         *
+         */
         var_dump($sitesList);
+        $findHttps = "/https?:\/\//mi";
+        $findDomainZone = "/.com|.ru|.net|.org/mi";
+        $matches = [];
+
         foreach ($sitesList as $item) {
-            $findHttp = preg_match('|^http?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $item);
-            $findHttps = preg_match('|^https?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $item);
-            if ($findHttp === 1 && $findHttps === 0){
-                var_dump(mb_strcut($item, 0, 7));
-            } else {
-                var_dump('1234');
+            preg_match($findHttps, $item, $matches);
+            if (!empty($matches)) {
+                $item = str_replace($matches[0], '', $item);
+            }
+            preg_match($findDomainZone, $item, $match);
+            if (!empty($match)) {
+                $arraySiteExplode = explode('.', $item);
+
+
+                foreach ($arraySiteExplode as $items) {
+                    if (count($arraySiteExplode) >= 3 || $arraySiteExplode[0] != 'www') {
+                        $item = implode('.', $arraySiteExplode);
+                        $resultValidSites[] = $item;
+                    }
+                }
             }
         }
+        var_dump($resultValidSites);
 
+        $uniqueValidSites = array_unique($resultValidSites);
+        var_dump($uniqueValidSites);
+
+        /**
+         * Разобраться, чего тут происходит и зачем
+         */
         $prosmotrArray = ['prosmotr', 'posetit', 'prosmotr-posetit'];
         $prosmotr = 'prosmotr';
         $timeArray = ['day', 'week', 'month'];
@@ -58,8 +102,15 @@ class SiteController
         if (!empty($data['time']) && in_array($data['time'], $timeArray)) {
             $prosmotr = $data['prosmotr'];
         }
-        $sites = [];
 
+        /**
+         * Создание на основании полученного списка сайтов,
+         * моделей сайтов.
+         * Методом getSiteData() смотрим, есть ли уже такой сайт
+         * если такого сайта нет, загружаем данные о новом сайте в бд
+         *
+         */
+        $sites = [];
         foreach ($sitesList as $item) {
             $site = new Site($item);
             $site->getSiteData();
@@ -69,7 +120,6 @@ class SiteController
             }
             $sites[] = $site;
         }
-
         $this->_smarty->assign('sites', $sites);
         $this->_smarty->display('main.tpl');
     }
@@ -77,6 +127,11 @@ class SiteController
     public function actionParsing()
     {
         ParserController::loadSitesData();
+    }
+
+    public function sendDataChart()
+    {
+
     }
 
 }
