@@ -77,11 +77,11 @@ class SiteController
 
 
                 foreach ($arraySiteExplode as $items) {
-                    if (count($arraySiteExplode) >= 3 || $arraySiteExplode[0] != 'www') {
+                    if (count($arraySiteExplode) > 1 || $arraySiteExplode[0] != 'www') {
                         $item = implode('.', $arraySiteExplode);
-                        $resultValidSites[] = $item;
                     }
                 }
+                $resultValidSites[] = $item;
             }
         }
         var_dump($resultValidSites);
@@ -90,7 +90,9 @@ class SiteController
         var_dump($uniqueValidSites);
 
         /**
-         * Разобраться, чего тут происходит и зачем
+         * Разобраться, чего тут происходит и зачем ^:)
+         *
+         * Здесь собирается всякое дермище для заполнения инпутов формы
          */
         $prosmotrArray = ['prosmotr', 'posetit', 'prosmotr-posetit'];
         $prosmotr = 'prosmotr';
