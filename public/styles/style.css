@@ -73,7 +73,7 @@ body{
     align-items: center;
     width: 100%;
     height: 50px;
-    margin-bottom: 100px;
+    margin-bottom: 40px;
 }
 .custom-select{
     margin: 10px;
@@ -98,6 +98,40 @@ body{
     width: 100%;
 }
 
+.period {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
 #chart_div {
-    width: 1000px;
+    width: 100%;
+    height: 40%;
+}
+.chart {
+    width: 100%;
+    min-height: 600px;
+}
+.row {
+    margin:0 !important;
+}
+
+#reportrange {
+    margin: 0 1%;
+    width: 205px;
+}
+@media (min-width: 576px) {
+
+}
+
+@media (min-width: 768px) {
+
+}
+
+@media (min-width: 992px) {
+
+}
+
+@media (min-width: 1200px) {
+
 }

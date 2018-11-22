@@ -22,4 +22,21 @@ class General
         self::$_smarty = $SMARTY;
     }
 
+    public static function pingTest()
+    {
+        $handle = fopen("https://www.liveinternet.ru/stat/liveinternet.ru/index.csv?graph=csv", "rd");
+        $i = -1;
+        while (!feof($handle)) {
+            $line = fgetcsv($handle, 1024);
+            $i++;
+        }
+        fclose($handle);
+        if (!empty($line)) {
+            return 1;
+            }else {
+                return 0;
+        }
+    }
+
 }
+

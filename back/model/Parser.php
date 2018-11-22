@@ -9,21 +9,20 @@ class Parser
     {
         $this->_db = General::getDb();
         /**
-         *
          * получаешь данные для сайта
          * сравниваешь их с теми, что у тебя уже были
          * те, что изменились - обновляешь. новые - добавляешь
          * профит
-         *
-         * P.S. заполни у модели Site массив с данными. С ними и будешь сравнивать новые
-         *
          */
     }
 
+    /**
+     * @param $site
+     */
     public function loadSiteData($site)
     {
-        //$site->url
-        $handle = fopen("http://parser/test.csv", "rd");
+
+        $handle = fopen("https://www.liveinternet.ru/stat/{$site->url}/index.csv?graph=csv", "rd"); //http://parser/test.csv
         $data = [];
         $i = -1;
         while (!feof($handle)) {
@@ -38,20 +37,28 @@ class Parser
             $i++;
         }
         fclose($handle);
-        $days = [];
-        $months = [];
-        foreach ($data as $item) {
-            $arrDate = explode(' ', $item['date']);
-            $days[] = $arrDate[0];
-            $months[] = $arrDate[1];
+        if (!empty($data)) {
+            Site::resetPingStatementError($site);
+
+            $days = [];
+            $months = [];
+            foreach ($data as $item) {
+                $arrDate = explode(' ', $item['date']);
+                $days[] = $arrDate[0];
+                $months[] = $arrDate[1];
+            }
+            $finalDate = $this->_correctDate($months, $days);
+            $resultData = [];
+            foreach ($data as $i => $item) {
+                $data[$i]['date'] = $finalDate[$i];
+                $resultData[$finalDate[$i]] = ['prosmotr' => $data[$i]['prosmotr'], 'posetit' => $data[$i]['posetit']];
+            }
+            $this->saveSiteData($resultData, $site);
+        } else {
+            Site::savePingStatementError($site);
+
+
         }
-        $finalDate = $this->_correctDate($months, $days);
-        $resultData = [];
-        foreach ($data as $i => $item) {
-            $data[$i]['date'] = $finalDate[$i];
-            $resultData[$finalDate[$i]] = ['prosmotr' => $data[$i]['prosmotr'], 'posetit' => $data[$i]['posetit']];
-        }
-        $this->saveSiteData($resultData, $site);
     }
 
     private function _correctDate($months, $days)

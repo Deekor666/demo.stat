@@ -1,8 +1,6 @@
 <?php
 
 require_once '../back/model/Parser.php';
-require_once '../back/model/Parser.php';
-
 
 class ParserController{
 
@@ -26,7 +24,7 @@ class ParserController{
     }
 
     /**
-     * функция, которую запускает крон
+     * запуск парсера
      */
     public static function loadSiteData($site)
     {
