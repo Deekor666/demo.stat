@@ -1,6 +1,6 @@
 <?php
 
-require_once '../back/model/Parser.php';
+require_once(BACK_DIR . 'model/Parser.php');
 
 class ParserController{
 

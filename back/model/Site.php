@@ -106,6 +106,7 @@ class Site
         $this->data = $data;
     }
 
+
     public static function getSiteByUrl($url)
     {
         $db = General::getDb();

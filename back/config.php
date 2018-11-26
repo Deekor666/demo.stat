@@ -13,3 +13,8 @@ $opt = [
 ];
 $DB = new PDO($dsn, $user, $pass, $opt);
 
+
+define('SITE_ROOT', realpath(dirname(__FILE__)) . '../');
+define('BACK_DIR', SITE_ROOT . '../back/');
+define('WWW_DIR', SITE_ROOT . '../public/');
+

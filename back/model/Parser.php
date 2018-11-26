@@ -17,12 +17,16 @@ class Parser
     }
 
     /**
-     * @param $site
+     *  Загрузка данных для сайта из liveinternet
+     * обработка, приведение к нужному виду
+     *
+     * если данные не приходят, в бд отмечается ошибка
+     * и состояние ставится в ноль
      */
     public function loadSiteData($site)
     {
 
-        $handle = fopen("https://www.liveinternet.ru/stat/{$site->url}/index.csv?graph=csv", "rd"); //http://parser/test.csv
+        $handle = fopen("https://www.liveinternet.ru/stat/{$site->url}/index.csv?graph=csv", "rd"); //  http://parser/test.csv
         $data = [];
         $i = -1;
         while (!feof($handle)) {

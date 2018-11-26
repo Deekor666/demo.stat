@@ -58,6 +58,7 @@
         </div>
     </form>
     <div id="chart_div"></div>
+    <div id="chart"></div>
 
 </div>
 <script type="text/javascript" src="../scripts/loader.js"></script>
@@ -70,21 +71,20 @@
     let siteData = '{$siteData}';
     let siteDatas = JSON.parse(siteData);
 
+    console.log(siteDatas);
+
     let error = '{$error}';
-    console.log(typeof error);
-    if (typeof error === "string" && error !== '' ){
+    if (typeof error === "string" && error !== '') {
         $('.for_error').append('<div class="alert alert-danger" role="alert">\n' +
             error +
             '</div>');
     }
 
-
     let siteErrors = '{$siteErrors}';
     let siteErrorsPars = JSON.parse(siteErrors);
 
-console.log(typeof siteErrorsPars);
-    if (typeof siteErrorsPars === 'object'){
-        let siteError = siteErrorsPars.join( ', ');
+    if (typeof siteErrorsPars === 'object') {
+        let siteError = siteErrorsPars.join(', ');
         $('.for_error').append(
             '<div class="alert alert-danger" role="alert">\n' + 'Невозможно выбрать статистику:' + ' ' + siteError +
             '</div>');
@@ -92,9 +92,10 @@ console.log(typeof siteErrorsPars);
 
     }
 
-
     {literal}
-    google.charts.load('current', {'packages':['line']});
+
+
+    google.charts.load('current', {'packages': ['line']});
     google.charts.setOnLoadCallback(drawChart);
 
     function drawChart() {
@@ -110,12 +111,13 @@ console.log(typeof siteErrorsPars);
                 alert('The user selected ' + topping);
             }
         }
+
         /**
          * Объект настроек
          */
         let options = {
-            animation:{duration: 1000, easing: 'out',},
-            vAxis: {scaleType: 'log', title: ' ', minValue:0, maxValue:1000},
+            animation: {duration: 1000, easing: 'out',},
+            vAxis: {scaleType: 'log', title: ' ', minValue: 0, maxValue: 1000},
             hAxis: {title: ' '},
             colors: ['#a52714', '#097138'],
             crosshair: {color: '#000', trigger: 'selection'}
@@ -134,6 +136,7 @@ console.log(typeof siteErrorsPars);
         // chart.draw(data, options);
 
     }
+
     {/literal}
 </script>
 

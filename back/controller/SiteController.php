@@ -1,6 +1,6 @@
 <?php
 
-require_once '../back/model/Site.php';
+require_once(BACK_DIR . 'model/Site.php');
 
 class SiteController
 {
@@ -50,7 +50,6 @@ class SiteController
                 }
             }
         }
-
         /**
          * Валидация сайтов
          */
@@ -94,25 +93,6 @@ class SiteController
         if (!empty($data['time']) && in_array($data['time'], $timeArray)) {
             $time = $data['time'];
         }
-
-        /**
-         * СДЕЛАТЬ ПРОВЕРКУ НА ДАТУ для инпута period
-         *
-         * получаем и преобразовываем нужный период
-         */
-
-        if (!empty($data['period'])) {
-            $period = $data['period'];
-            $period = explode('-', $period);
-            $dateStartTimestamp = strtotime($period[0]);
-            $dateEndTimestamp = strtotime($period[1]);
-        }
-//        $dateOne = explode('.', $period[0]);
-//        $dateOne = "$dateOne[2]-$dateOne[1]-$dateOne[0]";
-//        $dateOne = str_replace(' ', '', $dateOne);
-//        $dateTwo = explode('.', $period[1]);
-//        $dateTwo = "$dateTwo[2]-$dateTwo[1]-$dateTwo[0]";
-//        $dateTwo = str_replace(' ', '', $dateTwo);
         /**
          * Проверяем работает ли лайвИнтернет,
          *
@@ -140,6 +120,19 @@ class SiteController
                 $siteErrors[] = $site->url;
             }
         }
+
+        /**
+         * получаем и преобразовываем нужный период
+         */
+
+        if (!empty($data['period'])) {
+            $period = $data['period'];
+            $period = explode('-', $period);
+            $dateStartTimestamp = strtotime($period[0]);
+            $dateEndTimestamp = strtotime($period[1]);
+        }
+
+
         /**
          * подготовка данных для отправки в график
          *
@@ -148,17 +141,16 @@ class SiteController
          * ['2005',  1170, 460],
          * ['2006',  660, 1120],
          * ['2007',  1030, 540]]
-         */
-
-        /**
+         *
          * получение заглавной строки ['Year', 'Site1', 'Site1']
+         *
          */
         if (isset($period)) {
             $firstStrInArray = ['Date'];
             foreach ($sites as $item) {
                 $firstStrInArray[] = "$item->url";
             }
-
+//var_dump($period);
             $i = 0;
             $currentTimestamp = $dateStartTimestamp;
             $daysArray = [];
@@ -169,16 +161,25 @@ class SiteController
                 $daysArray[] = $day;
                 foreach ($sites as $site) {
                     if (!empty($site->data[$day])) {
-                        $test = $site->data[$day][$prosmotr];
-
-                        $res[] = $test;
+//var_dump($site);
+                        $test = $site->data[$day][$prosmotr]; // записываем в переменную тест количество просмотров
+                        $res[] = $test; // в $res первым ключём идёт $day, а дальше записываем тест, с просмотрами и посещениями
                     } else {
                         $res[] = 0;
                     }
                 }
-                $resultData[] = $res;
                 $i++;
                 $currentTimestamp = $dateStartTimestamp + $i * 86400;
+
+                $resultData[] = $res;
+
+            }
+            if ($time === 'week') {
+                $this->weekDateSort($resultData);
+//                    $currentTimestamp = $dateStartTimestamp + $i * 604800;
+            } elseif ($time === 'month') {
+                $this->monthDateSort($resultData);
+//                    $currentTimestamp = $dateStartTimestamp + $i * 2629743;
             }
 
             /**
@@ -203,8 +204,26 @@ class SiteController
         ParserController::loadSitesData();
     }
 
-    public function sendDataChart()
+    public function weekDateSort($dates)
     {
+        $weekDates = [];
+        $weekDates = array_chunk($dates, 7, true);
+//        var_dump($weekDates);
+        foreach ($weekDates as $date) {
+//            var_dump($date);
+            if (count($date) <= 6) {
+                for ($i = 0; $i <= count($date); $i++) {
+                    $sum = $date[$i][1] + $date[$i + 1][1];
+                }
+            }
+        }
+        var_dump($sum);
+    }
+
+    public
+    function monthDateSort($item)
+    {
+        var_dump($item);
 
     }
 

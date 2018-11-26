@@ -1,5 +1,10 @@
 $(function () {
 
+    /**
+     * Site logic
+     *
+     */
+
     let ul = $('.site_list');
     let $cloneTemplate = $('.list-group-item.clone');
     $('#btnGetSite').click(function () {
@@ -23,7 +28,7 @@ $(function () {
     };
     makeEventsForListGroupItem($('.list-group-item:visible'));
     /**
-     *  Календарь
+     *  Calendar
      */
 
     let start = moment().subtract(29, 'days');

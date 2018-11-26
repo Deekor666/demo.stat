@@ -33,8 +33,8 @@ class General
         fclose($handle);
         if (!empty($line)) {
             return 1;
-            }else {
-                return 0;
+        } else {
+            return 0;
         }
     }
 

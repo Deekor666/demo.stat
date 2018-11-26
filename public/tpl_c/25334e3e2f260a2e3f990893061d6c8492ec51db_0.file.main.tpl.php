@@ -1,18 +1,18 @@
 <?php
-/* Smarty version 3.1.34-dev-7, created on 2018-11-22 16:29:33
+/* Smarty version 3.1.34-dev-7, created on 2018-11-23 10:10:22
   from 'C:\USR\www\parser\public\tpl\main.tpl' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.34-dev-7',
-  'unifunc' => 'content_5bf676fdd99954_11825120',
+  'unifunc' => 'content_5bf76f9e9f4d46_68749013',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
     '25334e3e2f260a2e3f990893061d6c8492ec51db' => 
     array (
       0 => 'C:\\USR\\www\\parser\\public\\tpl\\main.tpl',
-      1 => 1542878971,
+      1 => 1542942615,
       2 => 'file',
     ),
   ),
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_5bf676fdd99954_11825120 (Smarty_Internal_Template $_smarty_tpl) {
+function content_5bf76f9e9f4d46_68749013 (Smarty_Internal_Template $_smarty_tpl) {
 ?><html lang="en">
 <head>
     <meta charset="UTF-8"/>
@@ -90,6 +90,7 @@ $_smarty_tpl->smarty->ext->_foreach->restore($_smarty_tpl, 1);?>
         </div>
     </form>
     <div id="chart_div"></div>
+    <div id="chart"></div>
 
 </div>
 <?php echo '<script'; ?>
@@ -114,23 +115,22 @@ $_smarty_tpl->smarty->ext->_foreach->restore($_smarty_tpl, 1);?>
 ';
     let siteDatas = JSON.parse(siteData);
 
+    console.log(siteDatas);
+
     let error = '<?php echo $_smarty_tpl->tpl_vars['error']->value;?>
 ';
-    console.log(typeof error);
-    if (typeof error === "string" && error !== '' ){
+    if (typeof error === "string" && error !== '') {
         $('.for_error').append('<div class="alert alert-danger" role="alert">\n' +
             error +
             '</div>');
     }
 
-
     let siteErrors = '<?php echo $_smarty_tpl->tpl_vars['siteErrors']->value;?>
 ';
     let siteErrorsPars = JSON.parse(siteErrors);
 
-console.log(typeof siteErrorsPars);
-    if (typeof siteErrorsPars === 'object'){
-        let siteError = siteErrorsPars.join( ', ');
+    if (typeof siteErrorsPars === 'object') {
+        let siteError = siteErrorsPars.join(', ');
         $('.for_error').append(
             '<div class="alert alert-danger" role="alert">\n' + 'Невозможно выбрать статистику:' + ' ' + siteError +
             '</div>');
@@ -138,9 +138,10 @@ console.log(typeof siteErrorsPars);
 
     }
 
-
     
-    google.charts.load('current', {'packages':['line']});
+
+
+    google.charts.load('current', {'packages': ['line']});
     google.charts.setOnLoadCallback(drawChart);
 
     function drawChart() {
@@ -156,12 +157,13 @@ console.log(typeof siteErrorsPars);
                 alert('The user selected ' + topping);
             }
         }
+
         /**
          * Объект настроек
          */
         let options = {
-            animation:{duration: 1000, easing: 'out',},
-            vAxis: {scaleType: 'log', title: ' ', minValue:0, maxValue:1000},
+            animation: {duration: 1000, easing: 'out',},
+            vAxis: {scaleType: 'log', title: ' ', minValue: 0, maxValue: 1000},
             hAxis: {title: ' '},
             colors: ['#a52714', '#097138'],
             crosshair: {color: '#000', trigger: 'selection'}
@@ -180,6 +182,7 @@ console.log(typeof siteErrorsPars);
         // chart.draw(data, options);
 
     }
+
     
 <?php echo '</script'; ?>
 >
