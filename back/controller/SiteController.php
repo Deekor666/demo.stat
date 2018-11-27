@@ -106,7 +106,6 @@ class SiteController
             $site = new Site($item);
             $pingState = General::pingTest();
             if ($pingState === 1) {
-                var_dump($site);
                 $site->getSiteData();
                 ParserController::loadSiteData($site);      // скорее всего неправильно работает loadSiteData
                 $site->getSiteData();                       // сделать проверку, если данные есть, сравнить их
@@ -152,7 +151,6 @@ class SiteController
             foreach ($sites as $item) {
                 $firstStrInArray[] = "$item->url";
             }
-//var_dump($period);
             $i = 0;
             $currentTimestamp = $dateStartTimestamp;
             $daysArray = [];
@@ -163,7 +161,6 @@ class SiteController
                 $daysArray[] = $day;
                 foreach ($sites as $site) {
                     if (!empty($site->data[$day])) {
-//var_dump($site);
                         $test = $site->data[$day][$prosmotr]; // записываем в переменную тест количество просмотров
                         $res[] = $test; // в $res первым ключём идёт $day, а дальше записываем тест, с просмотрами и посещениями
                     } else {
@@ -177,7 +174,7 @@ class SiteController
 
             }
             if ($time === 'week') {
-//                $this->weekDateSort($resultData);
+                $resultData = $this->weekDateSort($resultData);
                 $currentTimestamp = $dateStartTimestamp + $i * 604800;
             } elseif ($time === 'month') {
 //                $this->monthDateSort($resultData);
@@ -206,21 +203,55 @@ class SiteController
         ParserController::loadSitesData();
     }
 
-//    public function weekDateSort($dates)
-//    {
-//        $weekDates = [];
-//        $weekDates = array_chunk($dates, 7, true);
-//        var_dump($weekDates);
-//        foreach ($weekDates as $date) {
-//            var_dump($date);
-//            if (count($date) <= 6) {
-//                for ($i = 0; $i <= count($date); $i++) {
-//                    $sum = $date[$i][1] + $date[$i + 1][1];
-//                }
-//            }
-//        }
-//        var_dump($sum);
-//    }
+    public function weekDateSort($dates)
+    {
+        $i = 1;
+        $sum = 0;
+        $res = [];
+        //var_dump($dates);
+        $firstDayOfWeek = '';
+         foreach ($dates as $value){
+             $sum += $value[1];
+             if ($i == 1) {
+                 $firstDayOfWeek = $value[0];
+             }
+             if ($i == 7) {
+                 $res[] = [$firstDayOfWeek, $sum];
+                 $i = 0;
+             }
+             $i++;
+
+             /*
+
+            if ($i <= 7) {
+                if ($i == 0){
+                    $oneWeekDate[] = $value[0];
+                }
+                $sum += $value[1];
+                if ($i == 6) {
+                    $res[] = $sum;
+                }
+            } else{
+                $sum = 0;
+                $i = 0;
+            }
+             $i++;
+             */
+        }
+        var_dump($i, $sum, $firstDayOfWeek);
+        if ($i != 7) {
+            $res[] = [$firstDayOfWeek, $sum];
+        }
+
+        var_dump($res);
+        //var_dump($oneWeekDate);
+        $num = 0;
+        /*foreach ($oneWeekDate as $week){
+            $resultDataWeeks[$week] = $res[$num];
+            $num++;
+        }*/
+        //var_dump($resultDataWeeks);
+    }
 
     public
     function monthDateSort($item)
