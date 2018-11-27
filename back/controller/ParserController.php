@@ -16,6 +16,7 @@ class ParserController{
         $sites = Site::getSites();
         $parser = new Parser();
         foreach ($sites as $site) {
+            var_dump($site);
             $site->getSiteData(); //заполнили старые данные
             $parser->loadSiteData($site); //загружаем и сохраняем новые
         }

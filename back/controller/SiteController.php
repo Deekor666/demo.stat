@@ -54,7 +54,7 @@ class SiteController
          * Валидация сайтов
          */
         $findHttps = "/https?:\/\//mi";
-        $findDomainZone = "/.com|.ru|.net|.org|.рф/mi";
+        $findDomainZone = "/.com|.ru|.net|.org|.рф|.do/mi";
         $afterDomain = "/(\/.+)/mi";
         $matches = [];
         $resultValidSites = [];
@@ -106,11 +106,14 @@ class SiteController
             $site = new Site($item);
             $pingState = General::pingTest();
             if ($pingState === 1) {
+                var_dump($site);
                 $site->getSiteData();
-                if (empty($site->data)) {
-                    ParserController::loadSiteData($site);
-                    $site->getSiteData();
-                }
+                ParserController::loadSiteData($site);      // скорее всего неправильно работает loadSiteData
+                $site->getSiteData();                       // сделать проверку, если данные есть, сравнить их
+//                if (empty($site->data)) {                       // получается, если данные в сайте есть, то он новые не запрашивает?
+//                    ParserController::loadSiteData($site);      // скорее всего неправильно работает loadSiteData
+//                    $site->getSiteData();                       // сделать проверку, если данные есть, сравнить их
+//                }
             } else {
                 $error = "На данный момент, сервер статистики недоступен";
             }
@@ -120,7 +123,6 @@ class SiteController
                 $siteErrors[] = $site->url;
             }
         }
-
         /**
          * получаем и преобразовываем нужный период
          */
@@ -175,11 +177,11 @@ class SiteController
 
             }
             if ($time === 'week') {
-                $this->weekDateSort($resultData);
-//                    $currentTimestamp = $dateStartTimestamp + $i * 604800;
+//                $this->weekDateSort($resultData);
+                $currentTimestamp = $dateStartTimestamp + $i * 604800;
             } elseif ($time === 'month') {
-                $this->monthDateSort($resultData);
-//                    $currentTimestamp = $dateStartTimestamp + $i * 2629743;
+//                $this->monthDateSort($resultData);
+                $currentTimestamp = $dateStartTimestamp + $i * 2629743;
             }
 
             /**
@@ -204,21 +206,21 @@ class SiteController
         ParserController::loadSitesData();
     }
 
-    public function weekDateSort($dates)
-    {
-        $weekDates = [];
-        $weekDates = array_chunk($dates, 7, true);
+//    public function weekDateSort($dates)
+//    {
+//        $weekDates = [];
+//        $weekDates = array_chunk($dates, 7, true);
 //        var_dump($weekDates);
-        foreach ($weekDates as $date) {
+//        foreach ($weekDates as $date) {
 //            var_dump($date);
-            if (count($date) <= 6) {
-                for ($i = 0; $i <= count($date); $i++) {
-                    $sum = $date[$i][1] + $date[$i + 1][1];
-                }
-            }
-        }
-        var_dump($sum);
-    }
+//            if (count($date) <= 6) {
+//                for ($i = 0; $i <= count($date); $i++) {
+//                    $sum = $date[$i][1] + $date[$i + 1][1];
+//                }
+//            }
+//        }
+//        var_dump($sum);
+//    }
 
     public
     function monthDateSort($item)

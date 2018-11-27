@@ -43,12 +43,15 @@ class Parser
         fclose($handle);
         if (!empty($data)) {
             Site::resetPingStatementError($site);
-
             $days = [];
             $months = [];
             foreach ($data as $item) {
                 $arrDate = explode(' ', $item['date']);
-                $days[] = $arrDate[0];
+                if ($arrDate[0] >= '1' && $arrDate[0] <= '9'){              //переделываем числа от 1 до 9 в 01-09
+                    $days[] = "0$arrDate[0]";                               //чтобы при сравнении дальше они совпадали с теми, что в базе
+                } else {
+                    $days[] = $arrDate[0];
+                }
                 $months[] = $arrDate[1];
             }
             $finalDate = $this->_correctDate($months, $days);
@@ -106,6 +109,4 @@ class Parser
             }
         }
     }
-
-
 }
