@@ -177,7 +177,7 @@ class SiteController
                 $resultData = $this->weekDateSort($resultData);
                 $currentTimestamp = $dateStartTimestamp + $i * 604800;
             } elseif ($time === 'month') {
-//                $this->monthDateSort($resultData);
+                $resultData = $this->monthDateSort($resultData);
                 $currentTimestamp = $dateStartTimestamp + $i * 2629743;
             }
 
@@ -190,7 +190,7 @@ class SiteController
              * Перобразовываем параметры, для отправки на страницу
              */
             $this->_smarty->assign('siteData', json_encode($resultData));
-
+var_dump($resultData);
         }
         $this->_smarty->assign('sites', $sites);
         $this->_smarty->assign('error', $error);
@@ -208,56 +208,59 @@ class SiteController
         $i = 1;
         $sum = 0;
         $res = [];
-        //var_dump($dates);
         $firstDayOfWeek = '';
-         foreach ($dates as $value){
-             $sum += $value[1];
-             if ($i == 1) {
-                 $firstDayOfWeek = $value[0];
-             }
-             if ($i == 7) {
-                 $res[] = [$firstDayOfWeek, $sum];
-                 $i = 0;
-             }
-             $i++;
-
-             /*
-
-            if ($i <= 7) {
-                if ($i == 0){
-                    $oneWeekDate[] = $value[0];
-                }
-                $sum += $value[1];
-                if ($i == 6) {
-                    $res[] = $sum;
-                }
-            } else{
-                $sum = 0;
-                $i = 0;
+        foreach ($dates as $value) {
+            $sum += $value[1];
+            if ($i == 1) {
+                $firstDayOfWeek = $value[0];
             }
-             $i++;
-             */
+            if ($i == 7) {
+                $res[] = [$firstDayOfWeek, $sum];
+                $i = 0;
+                $sum = 0;
+            }
+            $i++;
         }
-        var_dump($i, $sum, $firstDayOfWeek);
         if ($i != 7) {
             $res[] = [$firstDayOfWeek, $sum];
         }
 
-        var_dump($res);
-        //var_dump($oneWeekDate);
-        $num = 0;
-        /*foreach ($oneWeekDate as $week){
-            $resultDataWeeks[$week] = $res[$num];
-            $num++;
-        }*/
-        //var_dump($resultDataWeeks);
+        return $res;
     }
 
-    public
-    function monthDateSort($item)
+    public function monthDateSort($items)
     {
-        var_dump($item);
+//        var_dump($items);
+        $varSite = 1;
+        $i = 1;
+        $sum = 0;
+        $res = [];
+        $firstDayMonth = '';
+        $startMonth = (int)explode('-', $items[0][0])[1]; // начальный месяц
+        $finalDate = $items[count($items) - 1][0];
+        foreach ($items as $value) {
+            $currentMonth = (int)explode('-', $value[0])[1]; // месяц в элементе массива
+            if ($currentMonth == $startMonth) {
+                if ($i == 1) {
+                    $firstDayMonth = $value[0];                     // запись даты отсчёта
+                    $i++;
+                }
+                    $sum += $value[$varSite];                       // сумма одного сайта
+                if ($value[0] == $finalDate) {
+                    $res[] = [$firstDayMonth, $sum];        // это последний день
 
+                }
+            } else {                       // если пришел другой месяц
+                $res[] = [$firstDayMonth, $sum];
+                $sum = 0;
+                $startMonth++;
+//                $i = 1;
+                $firstDayMonth = $value[0];         // это данные первого дня месяца
+            }
+        }
+        var_dump($res);
+
+        return $res;
     }
 
 }
