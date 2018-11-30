@@ -20,21 +20,26 @@ class Site
         if (!empty($url)) {
             $this->url = $url;
             $site = self::getSiteByUrl($url);
+            $isNew = false;
             if (empty($site)) {
                 $site = $this->save();
+                $isNew = 1;
             }
             $this->id = $site['id'];
             $this->dateCreate = $site['date_create'];
             $this->dateGetData = $site['date_get_data'];
             $this->st = $site['st'];
             $this->error = $site['error'];
+            if ($isNew) {
+                ParserController::loadSiteData($this);
+                $this->getSiteData();
+            }
         }
 
     }
 
     public function save()
     {
-
         $stmt = $this->_db->prepare('INSERT INTO sites SET url = :url');
         $stmt->execute([':url' => $this->url]);
         $site = self::getSiteByUrl($this->url);
