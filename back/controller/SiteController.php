@@ -10,9 +10,8 @@ class SiteController
     /**
      * SiteController constructor.
      * в конструкте запуск функции actionIndex
-     * или actionParsing
+     *
      */
-
     public function __construct()
     {
         $this->_smarty = General::getSmarty();
@@ -22,26 +21,21 @@ class SiteController
         }
         if ($action === 'index') {
             $this->actionIndex();
-        } else if ($action === 'parsing') {
-            $this->actionParsing();
         } else {
             echo 'Action error';
         }
     }
 
+
     /**
+     * получение формы
      *
+     * маршрутизация данных
      */
+
     public function actionIndex()
     {
-        $siteErrors = false;
-        $error = false;
         $sitesList = [];
-
-        /**
-         * получение формы
-         */
-
         $data = $_GET;
         if (!empty($data['siteNames'])) {
             foreach ($data['siteNames'] as $siteName) {
@@ -50,9 +44,30 @@ class SiteController
                 }
             }
         }
-        /**
-         * Валидация сайтов
-         */
+        $uniqueValidSites = $this->validation($sitesList);
+        $optionsArray = $this->inputOptions($data);
+        $sitesAndErrors = $this->createNewSites($uniqueValidSites);
+        $sortResultData = $this->formationData($sitesAndErrors['sites'], $optionsArray);
+
+        if ($optionsArray['time'] === 'week') {
+            $resultData = $this->weekDateSort($sortResultData);
+        } elseif ($optionsArray['time'] === 'month') {
+            $resultData = $this->monthDateSort($sortResultData);
+        } else {
+            $resultData = $this->dayDateSort($sortResultData);
+        }
+        $this->sendDataInIndex($resultData, $sitesAndErrors);
+
+    }
+
+    /**
+     * Валидация сайтов
+
+     * @param $sitesList
+     * @return array
+     */
+    public function validation($sitesList)
+    {
         $findHttps = "/https?:\/\//mi";
         $findDomainZone = "/.com|.ru|.net|.org|.рф|.do/mi";
         $afterDomain = "/(\/.+)/mi";
@@ -78,41 +93,30 @@ class SiteController
                 $resultValidSites[] = $item;
             }
         }
-
         $uniqueValidSites = array_unique($resultValidSites);
-        /**
-         * Здесь собирается всякое дерьмище для заполнения инпутов формы
-         */
-        $prosmotrArray = ['prosmotr', 'posetit'];
-        $prosmotr = 'prosmotr';
-        $timeArray = ['day', 'week', 'month'];
-        $time = 'day';
-        if (!empty($data['prosmotr']) && in_array($data['prosmotr'], $prosmotrArray)) {
-            $prosmotr = $data['prosmotr'];
-        }
-        if (!empty($data['time']) && in_array($data['time'], $timeArray)) {
-            $time = $data['time'];
-        }
-        /**
-         * Проверяем работает ли лайвИнтернет,
-         *
-         * Создание на основании полученного списка сайтов,
-         * моделей сайтов.
-         * Методом getSiteData() смотрим, есть ли уже такой сайт
-         * если такого сайта нет, загружаем данные о новом сайте в бд
-         */
+        return $uniqueValidSites;
+    }
+
+
+    /**
+     * Создание объектов сайтов
+     * Проверка работы liveInternet и прихода данных сайта ----------->Вынести отдельно?
+     *
+     * @param array $uniqueValidSites
+     * @return array ['sites' => $sites, 'siteErrors' => $siteErrors, 'error' => $error]
+     */
+    public function createNewSites($uniqueValidSites)
+    {
+        $error = false;
+        $siteErrors = false;
         $sites = [];
+        $pingState = General::pingTest();
         foreach ($uniqueValidSites as $item) {
             $site = new Site($item);
-            $pingState = General::pingTest();
             if ($pingState === 1) {
                 $site->getSiteData();
-                ParserController::loadSiteData($site);      // скорее всего неправильно работает loadSiteData
-                $site->getSiteData();                       // сделать проверку, если данные есть, сравнить их
-//                if (empty($site->data)) {                       // получается, если данные в сайте есть, то он новые не запрашивает?
-//                    ParserController::loadSiteData($site);      // скорее всего неправильно работает loadSiteData
-//                    $site->getSiteData();                       // сделать проверку, если данные есть, сравнить их
-//                }
+                ParserController::loadSiteData($site);
+                $site->getSiteData();
             } else {
                 $error = "На данный момент, сервер статистики недоступен";
             }
@@ -122,94 +126,135 @@ class SiteController
                 $siteErrors[] = $site->url;
             }
         }
-        /**
-         * получаем и преобразовываем нужный период
-         */
+        $sitesAndErrors = ['sites' => $sites, 'siteErrors' => $siteErrors, 'error' => $error];
+        return $sitesAndErrors;
+    }
 
+    /**
+     * получаем и преобразовываем данные из инпутов формы
+     *
+     * @param $data
+     * @return array
+     */
+    public function inputOptions($data)
+    {
+        $monthTimeStamp = 2629743;
+        $prosmotrArray = ['prosmotr', 'posetit'];
+        $timeArray = ['day', 'week', 'month'];
+        if (!empty($data['prosmotr']) && in_array($data['prosmotr'], $prosmotrArray)) {
+            $prosmotr = $data['prosmotr'];
+        } else {
+            $prosmotr = 'posetit';
+        }
+        if (!empty($data['time']) && in_array($data['time'], $timeArray)) {
+            $time = $data['time'];
+        } else {
+            $time = 'day';
+        }
+        /**
+         * Нужно задать значение периода по умолчанию. Пусть это будет месяц, если выбрано "по дням" и т.п.
+         */
         if (!empty($data['period'])) {
             $period = $data['period'];
             $period = explode('-', $period);
             $dateStartTimestamp = strtotime($period[0]);
             $dateEndTimestamp = strtotime($period[1]);
+        } else if ($time === 'month') {
+            $dateEndTimestamp = strtotime(date("Y-m-d"));
+            $dateStartTimestamp = $dateEndTimestamp - ($monthTimeStamp * 6);
+        } else if ($time === 'week') {
+            $dateEndTimestamp = strtotime(date("Y-m-d"));
+            $dateStartTimestamp = $dateEndTimestamp - ($monthTimeStamp * 3);
+        } else {
+            $dateEndTimestamp = strtotime(date("Y-m-d"));
+            $dateStartTimestamp = $dateEndTimestamp - $monthTimeStamp;
         }
+        $optionsArray = ['dateStartTimestamp' => $dateStartTimestamp, 'dateEndTimestamp' => $dateEndTimestamp, 'time' => $time, 'prosmotr' => $prosmotr];
+        return $optionsArray;
+    }
 
 
-        /**
-         * подготовка данных для отправки в график
-         *
-         * [['Year', 'Sales', 'Expenses'],
-         * ['2004', 1000, 400],
-         * ['2005',  1170, 460],
-         * ['2006',  660, 1120],
-         * ['2007',  1030, 540]]
-         *
-         * получение заглавной строки ['Year', 'Site1', 'Site1']
-         *
-         */
-        if (isset($period)) {
-            $firstStrInArray = ['Date'];
-            foreach ($sites as $item) {
-                $firstStrInArray[] = "$item->url";
+    /**
+     *
+     * Формирование данных в удобной форме
+     *
+     * [siteID => ['xx.xx.xx' => 123, 'yy.yy.yy' => 345], siteID => ['xx.xx.xx' => 123, 'yy.yy.yy' => 345]]
+     *
+     * @param $sites
+     * @param $options
+     * @return array
+     */
+
+    //todo: На выходе одинаковые данные сайтов.
+    public function formationData($sites, $options)
+    {
+        $i = 0;
+        $currentTimestamp = $options['dateStartTimestamp'];
+        $resultData = [];
+        while ($currentTimestamp <= $options['dateEndTimestamp']) {
+            $day = date("Y-m-d", $currentTimestamp);
+            foreach ($sites as $site) {
+                if (!empty($site->data[$day])) {
+                    $url = $site->url;
+                    $res[$day] = $site->data[$day][$options['prosmotr']];
+                    $resultData[$url] = $res;
+//                    var_dump($resultData);
+                } else {
+                    $res[] = 0;
+                }
             }
-            $i = 0;
-            $currentTimestamp = $dateStartTimestamp;
-            $daysArray = [];
-            $resultData = [];
-            while ($currentTimestamp <= $dateEndTimestamp) {
-                $day = date("Y-m-d", $currentTimestamp);
-                $res = [$day];
-                $daysArray[] = $day;
-                foreach ($sites as $site) {
-                    if (!empty($site->data[$day])) {
-                        $test = $site->data[$day][$prosmotr]; // записываем в переменную тест количество просмотров
-                        $res[] = $test; // в $res первым ключём идёт $day, а дальше записываем тест, с просмотрами и посещениями
-                    } else {
-                        $res[] = 0;
-                    }
+            $i++;
+            $currentTimestamp = $options['dateStartTimestamp'] + $i * 86400;
+        }
+        var_dump($resultData);
+        return $resultData;
+    }
+
+
+    /**
+     *
+     * [['Date', 'Site1', 'Site2'],
+     * ['2004', 1000, 400],
+     * ['2005',  1170, 460],
+     * ['2006',  660, 1120],
+     * ['2007',  1030, 540]]
+
+     * @param $data
+     * @return array
+     */
+    //todo: Проверить работу
+    public function dayDateSort($data)
+    {
+//                var_dump($data);
+        $resultData = [];
+        $i = 1;
+        $firstStrArray = ['Date'];
+        foreach ($data as $url => $dates){
+            $firstStrArray[] = $url;
+        }
+        $resultData[] = $firstStrArray;
+        foreach ($data as $site) {
+            foreach ($site as $date => $value) {
+                if (empty($resultData[$i])) {
+                    $resultData[$i] = [$date, $value];
+                } else {
+                    $resultData[$i][] = $value;
                 }
                 $i++;
-                $currentTimestamp = $dateStartTimestamp + $i * 86400;
-
-                $resultData[] = $res;
-
             }
-            if ($time === 'week') {
-                $resultData = $this->weekDateSort($resultData);
-                $currentTimestamp = $dateStartTimestamp + $i * 604800;
-            } elseif ($time === 'month') {
-                $resultData = $this->monthDateSort($resultData);
-                $currentTimestamp = $dateStartTimestamp + $i * 2629743;
-            }
-
-            /**
-             * Склеиваемм массив с датой и данными для графика
-             */
-            array_unshift($resultData, $firstStrInArray);
-
-            /**
-             * Перобразовываем параметры, для отправки на страницу
-             */
-            $this->_smarty->assign('siteData', json_encode($resultData));
-var_dump($resultData);
+            $i = 1;
         }
-        $this->_smarty->assign('sites', $sites);
-        $this->_smarty->assign('error', $error);
-        $this->_smarty->assign('siteErrors', json_encode($siteErrors));
-        $this->_smarty->display('main.tpl');
+//        var_dump($resultData);
+        return $resultData;
     }
-
-    public function actionParsing()
-    {
-        ParserController::loadSitesData();
-    }
-
-    public function weekDateSort($dates)
+    //todo: Переделать под новые входные параметры
+    public function weekDateSort($data)
     {
         $i = 1;
         $sum = 0;
         $res = [];
         $firstDayOfWeek = '';
-        foreach ($dates as $value) {
+        foreach ($data as $value) {
             $sum += $value[1];
             if ($i == 1) {
                 $firstDayOfWeek = $value[0];
@@ -227,40 +272,27 @@ var_dump($resultData);
 
         return $res;
     }
-
+    //todo: Доделать
     public function monthDateSort($items)
     {
-//        var_dump($items);
-        $varSite = 1;
-        $i = 1;
-        $sum = 0;
-        $res = [];
-        $firstDayMonth = '';
-        $startMonth = (int)explode('-', $items[0][0])[1]; // начальный месяц
-        $finalDate = $items[count($items) - 1][0];
-        foreach ($items as $value) {
-            $currentMonth = (int)explode('-', $value[0])[1]; // месяц в элементе массива
-            if ($currentMonth == $startMonth) {
-                if ($i == 1) {
-                    $firstDayMonth = $value[0];                     // запись даты отсчёта
-                    $i++;
-                }
-                    $sum += $value[$varSite];                       // сумма одного сайта
-                if ($value[0] == $finalDate) {
-                    $res[] = [$firstDayMonth, $sum];        // это последний день
+        $test = $items;
+        return $test;
+    }
 
-                }
-            } else {                       // если пришел другой месяц
-                $res[] = [$firstDayMonth, $sum];
-                $sum = 0;
-                $startMonth++;
-//                $i = 1;
-                $firstDayMonth = $value[0];         // это данные первого дня месяца
-            }
-        }
-        var_dump($res);
+    /**
+     * Отправка данных в шаблон
+     *
+     * @param $resultData
+     * @param $sitesAndErrors
+     */
+    public function sendDataInIndex($resultData, $sitesAndErrors)
+    {
+        $this->_smarty->assign('siteData', json_encode($resultData));
 
-        return $res;
+        $this->_smarty->assign('sites', $sitesAndErrors['sites']);
+        $this->_smarty->assign('error', $sitesAndErrors['error']);
+        $this->_smarty->assign('siteErrors', json_encode($sitesAndErrors['siteErrors']));
+        $this->_smarty->display('main.tpl');
     }
 
 }
