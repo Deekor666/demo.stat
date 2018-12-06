@@ -44,6 +44,7 @@ body{
     align-items: center;
     padding: 5px;
     min-width: 20%;
+    border-radius: 5px;
     /*width: 25%;*/
 }
 .list-group-item a {
