@@ -50,19 +50,17 @@ class SiteController
         $sortResultData = $this->formationData($sitesAndErrors['sites'], $optionsArray);
 
         if ($optionsArray['time'] === 'week') {
-            $resultData = $this->weekDateSort($sortResultData);
+            $sortResultData = $this->weekDateSort($sortResultData);
         } elseif ($optionsArray['time'] === 'month') {
-            $resultData = $this->monthDateSort($sortResultData);
-        } else {
-            $resultData = $this->dayDateSort($sortResultData);
+            $sortResultData = $this->monthDateSort($sortResultData);
         }
+        $resultData = $this->makeDataForChart($sortResultData);
         $this->sendDataInIndex($resultData, $sitesAndErrors);
 
     }
 
     /**
      * Валидация сайтов
-
      * @param $sitesList
      * @return array
      */
@@ -151,65 +149,58 @@ class SiteController
         } else {
             $time = 'day';
         }
-        /**
-         * Нужно задать значение периода по умолчанию. Пусть это будет месяц, если выбрано "по дням" и т.п.
-         */
         if (!empty($data['period'])) {
             $period = $data['period'];
             $period = explode('-', $period);
             $dateStartTimestamp = strtotime($period[0]);
             $dateEndTimestamp = strtotime($period[1]);
-        } else if ($time === 'month') {
-            $dateEndTimestamp = strtotime(date("Y-m-d"));
-            $dateStartTimestamp = $dateEndTimestamp - ($monthTimeStamp * 6);
-        } else if ($time === 'week') {
-            $dateEndTimestamp = strtotime(date("Y-m-d"));
-            $dateStartTimestamp = $dateEndTimestamp - ($monthTimeStamp * 3);
         } else {
-            $dateEndTimestamp = strtotime(date("Y-m-d"));
-            $dateStartTimestamp = $dateEndTimestamp - $monthTimeStamp;
+            if ($time === 'month') {
+                $dateEndTimestamp = strtotime(date("Y-m-d"));
+                $dateStartTimestamp = $dateEndTimestamp - ($monthTimeStamp * 6);
+            } else if ($time === 'week') {
+                $dateEndTimestamp = strtotime(date("Y-m-d"));
+                $dateStartTimestamp = $dateEndTimestamp - ($monthTimeStamp * 3);
+            } else {
+                $dateEndTimestamp = strtotime(date("Y-m-d"));
+                $dateStartTimestamp = $dateEndTimestamp - $monthTimeStamp;
+            }
         }
         $optionsArray = ['dateStartTimestamp' => $dateStartTimestamp, 'dateEndTimestamp' => $dateEndTimestamp, 'time' => $time, 'prosmotr' => $prosmotr];
         return $optionsArray;
     }
 
-
     /**
-     *
      * Формирование данных в удобной форме
-     *
-     * [siteID => ['xx.xx.xx' => 123, 'yy.yy.yy' => 345], siteID => ['xx.xx.xx' => 123, 'yy.yy.yy' => 345]]
      *
      * @param $sites
      * @param $options
-     * @return array
+     * @return array [url1 => ['xx.xx.xx' => 123, 'yy.yy.yy' => 345], url2 => ['xx.xx.xx' => 123, 'yy.yy.yy' => 345]]
      */
-
-    //todo: На выходе одинаковые данные сайтов.
     public function formationData($sites, $options)
     {
+        $res = [];
         $i = 0;
         $currentTimestamp = $options['dateStartTimestamp'];
         $resultData = [];
         while ($currentTimestamp <= $options['dateEndTimestamp']) {
             $day = date("Y-m-d", $currentTimestamp);
             foreach ($sites as $site) {
+                $url = $site->url;
                 if (!empty($site->data[$day])) {
-                    $url = $site->url;
-                    $res[$day] = $site->data[$day][$options['prosmotr']];
-                    $resultData[$url] = $res;
-//                    var_dump($resultData);
+                    $res[$url][$day] = $site->data[$day][$options['prosmotr']];
                 } else {
-                    $res[] = 0;
+                    $res[$url][$day] = 0;
                 }
+                $resultData = $res;
             }
+
             $i++;
             $currentTimestamp = $options['dateStartTimestamp'] + $i * 86400;
         }
-        var_dump($resultData);
+
         return $resultData;
     }
-
 
     /**
      *
@@ -218,18 +209,16 @@ class SiteController
      * ['2005',  1170, 460],
      * ['2006',  660, 1120],
      * ['2007',  1030, 540]]
-
      * @param $data
      * @return array
      */
-    //todo: Проверить работу
-    public function dayDateSort($data)
+
+    public function makeDataForChart($data)
     {
-//                var_dump($data);
         $resultData = [];
         $i = 1;
         $firstStrArray = ['Date'];
-        foreach ($data as $url => $dates){
+        foreach ($data as $url => $dates) {
             $firstStrArray[] = $url;
         }
         $resultData[] = $firstStrArray;
@@ -244,39 +233,92 @@ class SiteController
             }
             $i = 1;
         }
-//        var_dump($resultData);
         return $resultData;
     }
-    //todo: Переделать под новые входные параметры
+
     public function weekDateSort($data)
     {
-        $i = 1;
+        $dateStart = '';
         $sum = 0;
-        $res = [];
-        $firstDayOfWeek = '';
-        foreach ($data as $value) {
-            $sum += $value[1];
-            if ($i == 1) {
-                $firstDayOfWeek = $value[0];
+        $resultData = [];
+        $i = 0;
+
+        foreach ($data as $url => $site) {
+            foreach ($site as $date => $value) {
+                if ($i === 0) {
+                    $dateStart = $date;
+                    $sum += $value;
+                    $i++;
+                } else if ($i > 0 && $i < 7) {
+                    $sum += $value;
+                    $i++;
+                } else if ($i === 7) {
+                    $resultData[$url][$dateStart] = $sum;
+                    $dateStart = $date;
+                    $i = 1;
+                    $sum = 0;
+                }
             }
-            if ($i == 7) {
-                $res[] = [$firstDayOfWeek, $sum];
-                $i = 0;
-                $sum = 0;
-            }
-            $i++;
-        }
-        if ($i != 7) {
-            $res[] = [$firstDayOfWeek, $sum];
+            $resultData[$url][$dateStart] = $sum;
+            $i = 0;
+            $sum = 0;
         }
 
-        return $res;
+        return $resultData;
     }
-    //todo: Доделать
-    public function monthDateSort($items)
+
+    // @TODO: Доделать
+    public function monthDateSort($data)
     {
-        $test = $items;
-        return $test;
+        $dateStart = '';
+        $sum = 0;
+        $resultData = [];
+        $i = 0;
+        $currentMonth = '';
+        foreach ($data as $url => $site) {
+            foreach ($site as $date => $value) {
+                $month = date('M', strtotime($date));
+                if (empty($currentMonth)) {
+                    $currentMonth = $month;
+                    $dateStart = $date;
+                }
+                if ($month != $currentMonth) {
+                    $resultData[$url][$dateStart] = $sum;
+                    $dateStart = $date;
+                    $sum = 0;
+                    $currentMonth = $month;
+                } else {
+                    $sum += $value;
+
+                }
+
+                /*
+                if ($i === 0) {
+                    $dateStart = $date;
+                    $sum += $value;
+                    $i++;
+                } else if ($i > 0 && $i < 7) {
+                    $sum += $value;
+                    $i++;
+                } else if ($i === 7) {
+                    $resultData[$url][$dateStart] = $sum;
+                    $dateStart = $date;
+                    $i = 1;
+                    $sum = 0;
+                }
+                */
+            }
+            $resultData[$url][$dateStart] = $sum;
+
+
+            /*
+            $resultData[$url][$dateStart] = $sum;
+            $i = 0;
+            $sum = 0;
+            */
+        }
+var_dump($resultData);
+        return $resultData;
     }
 
     /**
