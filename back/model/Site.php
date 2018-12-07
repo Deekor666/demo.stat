@@ -35,7 +35,6 @@ class Site
                 $this->getSiteData();
             }
         }
-
     }
 
     public function save()
@@ -46,10 +45,12 @@ class Site
         return $site;
     }
 
+
     /**
      * Метод записывающий +1 ошибку, если данные сайта не пришли
+     *
+     * @param $site
      */
-
     public static function savePingStatementError($site)
     {
         $db = General::getDb();
@@ -58,10 +59,12 @@ class Site
         Site::statementSiteOff($site);
     }
 
+
     /**
      * Метод обнуляющий ошибку, если данные сайта пришли
+     *
+     * @param $site
      */
-
     public static function resetPingStatementError($site)
     {
         $db = General::getDb();
@@ -70,10 +73,12 @@ class Site
         Site::statementSiteOn($site);
     }
 
+
     /**
      * Метод изменяющий состояние сайта на вкл. изменением состояния на 1
+     *
+     * @param $site
      */
-
     public static function statementSiteOn($site)
     {
         $db = General::getDb();
@@ -82,10 +87,12 @@ class Site
 
     }
 
+
     /**
      * Метод изменяющий состояние сайта на выкл. изменением состояния на 0
+     *
+     * @param $site
      */
-
     public static function statementSiteOff($site)
     {
         $db = General::getDb();
@@ -112,6 +119,10 @@ class Site
     }
 
 
+    /**
+     * @param $url
+     * @return array
+     */
     public static function getSiteByUrl($url)
     {
         $db = General::getDb();
@@ -127,6 +138,9 @@ class Site
 
     /**
      * Получаем список сайтов, у которых состояние 1 (которые находятся в списке просмотра)
+     *
+     * @param bool $withData
+     * @return array
      */
     public static function getSites($withData = false)
     {
