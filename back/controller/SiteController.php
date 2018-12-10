@@ -194,7 +194,6 @@ class SiteController
                 }
                 $resultData = $res;
             }
-
             $i++;
             $currentTimestamp = $options['dateStartTimestamp'] + $i * 86400;
         }
@@ -267,13 +266,11 @@ class SiteController
         return $resultData;
     }
 
-    // @TODO: Доделать
     public function monthDateSort($data)
     {
         $dateStart = '';
         $sum = 0;
         $resultData = [];
-        $i = 0;
         $currentMonth = '';
         foreach ($data as $url => $site) {
             foreach ($site as $date => $value) {
@@ -289,35 +286,11 @@ class SiteController
                     $currentMonth = $month;
                 } else {
                     $sum += $value;
-
                 }
-
-                /*
-                if ($i === 0) {
-                    $dateStart = $date;
-                    $sum += $value;
-                    $i++;
-                } else if ($i > 0 && $i < 7) {
-                    $sum += $value;
-                    $i++;
-                } else if ($i === 7) {
-                    $resultData[$url][$dateStart] = $sum;
-                    $dateStart = $date;
-                    $i = 1;
-                    $sum = 0;
-                }
-                */
             }
             $resultData[$url][$dateStart] = $sum;
-
-
-            /*
-            $resultData[$url][$dateStart] = $sum;
-            $i = 0;
-            $sum = 0;
-            */
         }
-var_dump($resultData);
+        var_dump($resultData);
         return $resultData;
     }
 

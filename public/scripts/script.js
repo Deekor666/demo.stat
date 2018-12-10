@@ -5,6 +5,23 @@ $(function () {
      *
      */
 
+
+    let actionFunction = function () {
+        let inSiteForm = $('.form-control').val();
+        if (inSiteForm !== '') {
+            let $newListItem = $cloneTemplate.clone();
+            $newListItem.removeClass('clone');
+            $(".list-group-item-url", $newListItem).text(inSiteForm);
+            $(".list-group-item-url", $newListItem).attr('href', 'https://' + inSiteForm);
+            $("input", $newListItem).val(inSiteForm);
+            $('.form-control').val('');
+            ul.append($newListItem);
+            makeEventsForListGroupItem($newListItem);
+            return false;
+
+        }
+    };
+
     let ul = $('.site_list');
     let $cloneTemplate = $('.list-group-item.clone');
     $('#btnGetSite').click(function () {
@@ -18,6 +35,14 @@ $(function () {
             $('.form-control').val('');
             ul.append($newListItem);
             makeEventsForListGroupItem($newListItem);
+        }
+    });
+    $('#basic-url').on('keyup keypress', function(e) {
+        let keyCode = e.keyCode || e.which;
+        if (keyCode === 13) {
+            actionFunction();
+            e.preventDefault();
+            return e.which !== 13;
         }
     });
     let makeEventsForListGroupItem = function ($domElem) {
