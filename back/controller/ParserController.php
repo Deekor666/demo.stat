@@ -13,12 +13,10 @@ class ParserController{
 
     public static function loadSitesData()
     {
-        $sites = Site::getSites();
+        $sites = Site::getSites(true);
         $parser = new Parser();
         foreach ($sites as $site) {
-            var_dump($site);
-            $site->getSiteData(); //заполнили старые данные
-            $parser->loadSiteData($site); //загружаем и сохраняем новые
+            $parser->loadAltSiteData($site);
         }
 
         echo 'ok';
@@ -26,11 +24,14 @@ class ParserController{
 
     /**
      * запуск парсера
+     *
+     * @param $site
      */
     public static function loadSiteData($site)
     {
         $parser = new Parser();
-        $parser->loadSiteData($site);
+        $parser->loadAltSiteData($site);
+
     }
 
 }

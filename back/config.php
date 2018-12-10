@@ -1,8 +1,5 @@
 <?php
-$host = '127.0.0.1';
-$db   = 'parserbase';
-$user = 'root';
-$pass = '12345';
+require_once '../back/dbconfig.php';
 $charset = 'utf8';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
