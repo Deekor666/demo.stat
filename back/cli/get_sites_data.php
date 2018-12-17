@@ -1,8 +1,12 @@
 <?php
-
-require_once '../config.php';
-require_once '../General.php';
-require_once '../../public/libs/Smarty.class.php';
+$_SERVER['DOCUMENT_ROOT'] = dirname(__FILE__) . '/..';
+set_include_path(implode(PATH_SEPARATOR, array(
+    realpath(__DIR__ . '/..'),
+    get_include_path(),
+)));
+require_once 'config.php';
+require_once 'General.php';
+require_once (SITE_ROOT  . '../public/libs/Smarty.class.php');
 
 
 $SMARTY = new Smarty();

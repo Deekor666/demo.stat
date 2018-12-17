@@ -1,5 +1,6 @@
 <?php
-require_once '../back/dbconfig.php';
+
+require_once 'dbconfig.php';
 $charset = 'utf8';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";

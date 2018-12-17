@@ -1,18 +1,18 @@
 <?php
-/* Smarty version 3.1.34-dev-7, created on 2018-11-23 10:10:22
-  from 'C:\USR\www\parser\public\tpl\main.tpl' */
+/* Smarty version 3.1.34-dev-7, created on 2018-12-12 08:44:10
+  from '/var/www/parser/public/tpl/main.tpl' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.34-dev-7',
-  'unifunc' => 'content_5bf76f9e9f4d46_68749013',
+  'unifunc' => 'content_5c10ca5ae6b1b9_10708845',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
-    '25334e3e2f260a2e3f990893061d6c8492ec51db' => 
+    '150563f9bf273a096b523abd896ec7ee2253c605' => 
     array (
-      0 => 'C:\\USR\\www\\parser\\public\\tpl\\main.tpl',
-      1 => 1542942615,
+      0 => '/var/www/parser/public/tpl/main.tpl',
+      1 => 1544525225,
       2 => 'file',
     ),
   ),
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_5bf76f9e9f4d46_68749013 (Smarty_Internal_Template $_smarty_tpl) {
+function content_5c10ca5ae6b1b9_10708845 (Smarty_Internal_Template $_smarty_tpl) {
 ?><html lang="en">
 <head>
     <meta charset="UTF-8"/>
