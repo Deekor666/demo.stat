@@ -71,8 +71,6 @@
     let siteData = '{$siteData}';
     let siteDatas = JSON.parse(siteData);
 
-    console.log(siteDatas);
-
     let error = '{$error}';
     if (typeof error === "string" && error !== '') {
         $('.for_error').append('<div class="alert alert-danger" role="alert">\n' +
