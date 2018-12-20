@@ -1,18 +1,18 @@
 <?php
-/* Smarty version 3.1.34-dev-7, created on 2018-12-12 08:44:10
+/* Smarty version 3.1.34-dev-7, created on 2018-12-19 08:22:34
   from '/var/www/parser/public/tpl/main.tpl' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.34-dev-7',
-  'unifunc' => 'content_5c10ca5ae6b1b9_10708845',
+  'unifunc' => 'content_5c199d5a3287b4_93871826',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
     '150563f9bf273a096b523abd896ec7ee2253c605' => 
     array (
       0 => '/var/www/parser/public/tpl/main.tpl',
-      1 => 1544525225,
+      1 => 1545128990,
       2 => 'file',
     ),
   ),
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_5c10ca5ae6b1b9_10708845 (Smarty_Internal_Template $_smarty_tpl) {
+function content_5c199d5a3287b4_93871826 (Smarty_Internal_Template $_smarty_tpl) {
 ?><html lang="en">
 <head>
     <meta charset="UTF-8"/>
@@ -115,8 +115,6 @@ $_smarty_tpl->smarty->ext->_foreach->restore($_smarty_tpl, 1);?>
 ';
     let siteDatas = JSON.parse(siteData);
 
-    console.log(siteDatas);
-
     let error = '<?php echo $_smarty_tpl->tpl_vars['error']->value;?>
 ';
     if (typeof error === "string" && error !== '') {
@@ -191,5 +189,6 @@ $_smarty_tpl->smarty->ext->_foreach->restore($_smarty_tpl, 1);?>
  src="../scripts/script.js"><?php echo '</script'; ?>
 >
 </body>
-</html><?php }
+</html>
+<?php }
 }
