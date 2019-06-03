@@ -118,7 +118,8 @@
             vAxis: {scaleType: 'log', title: ' ', minValue: 0, maxValue: 1000},
             hAxis: {title: ' '},
             colors: ['#a52714', '#097138'],
-            crosshair: {color: '#000', trigger: 'selection'}
+            crosshair: {color: '#000', trigger: 'selection'},
+            'height':500
         };
 
         /**
