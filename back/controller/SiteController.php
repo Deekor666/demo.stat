@@ -40,6 +40,7 @@ class SiteController
         if (!empty($data['siteNames'])) {
             foreach ($data['siteNames'] as $siteName) {
                 if (!empty($siteName)) {
+                    trim($siteName);
                     $sitesList[] = $siteName;
                 }
             }
