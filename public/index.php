@@ -3,7 +3,6 @@ require_once '../back/config.php';
 require_once '../back/General.php';
 require_once 'libs/Smarty.class.php';
 
-
 $SMARTY = new Smarty();
 $SMARTY->template_dir = 'tpl/';
 $SMARTY->compile_dir = 'tpl_c/';
