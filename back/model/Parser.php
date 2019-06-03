@@ -49,9 +49,8 @@ class Parser
         }
         if (array_key_exists ( 'error' , $finalData )) {
             Site::savePingStatementError($site);
-
         } else {
-            $outData[$dateToday] = ['prosmotr' => $finalData['today_hit'], 'posetit' => $finalData['today_vis']];
+            $outData[$dateToday] = ['prosmotr' => $finalData['today_vis'], 'posetit' => $finalData['today_hit']];
             Site::resetPingStatementError($site);
             $this->saveSiteData($outData, $site);
 
