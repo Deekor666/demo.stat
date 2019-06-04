@@ -16,7 +16,7 @@ class ParserController{
         $sites = Site::getSites(true);
         $parser = new Parser();
         foreach ($sites as $site) {
-            $parser->loadAltSiteData($site);
+            $parser->loadAltSiteData($site, true);
         }
 
         echo 'ok';
@@ -30,7 +30,7 @@ class ParserController{
     public static function loadSiteData($site)
     {
         $parser = new Parser();
-        $parser->loadAltSiteData($site);
+        $parser->loadAltSiteData($site, false);
 
     }
 
