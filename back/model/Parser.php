@@ -1,4 +1,6 @@
 <?php
+require_once(BACK_DIR . '/cli/Logger.php');
+
 
 class Parser
 {
