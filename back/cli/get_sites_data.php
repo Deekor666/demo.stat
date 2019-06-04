@@ -16,5 +16,6 @@ $SMARTY->cache_dir = 'cache/';
 General::init($DB, $SMARTY);
 require_once(BACK_DIR . '/controller/SiteController.php');
 require_once(BACK_DIR . '/controller/ParserController.php');
+require_once(BACK_DIR . '/cli/Logger.php');
 
 ParserController::loadSitesData();

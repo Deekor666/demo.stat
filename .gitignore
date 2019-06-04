@@ -1,2 +1,3 @@
-dbconfig.php
+/back/dbconfig.php
 /public/tpl_c
+/back/cli/log.txt

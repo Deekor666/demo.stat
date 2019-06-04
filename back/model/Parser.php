@@ -53,6 +53,10 @@ class Parser
             $outData[$dateToday] = ['prosmotr' => $finalData['today_hit'], 'posetit' => $finalData['today_vis']];
             Site::resetPingStatementError($site);
             $this->saveSiteData($outData, $site);
+            $logString = "Site: $site->url | Prosmotr: {$finalData['today_hit']} | Posetit: {$finalData['today_vis']}";
+            Logger::start();
+            Logger::write($logString);
+            Logger::stop();
 
         }
     }
