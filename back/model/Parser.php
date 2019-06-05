@@ -26,6 +26,7 @@ class Parser
      * и состояние ставится в ноль
      *
      * @param $site
+     * @param bool $state
      */
     public function loadAltSiteData($site, $state = false)
     {

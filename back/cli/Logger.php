@@ -30,6 +30,7 @@ class Logger
             $tim = '[' . date('Y-m-d H:i:s') . '] ';
         else
             $tim = '';
+        echo "$tim . $s . \n";
         fwrite(self::$fplog, $tim . $s . "\n");
     }
 }
