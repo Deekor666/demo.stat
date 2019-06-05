@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Europe/Moscow');
 $_SERVER['DOCUMENT_ROOT'] = dirname(__FILE__) . '/..';
 set_include_path(implode(PATH_SEPARATOR, array(
     realpath(__DIR__ . '/..'),

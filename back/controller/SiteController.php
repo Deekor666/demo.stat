@@ -291,7 +291,6 @@ class SiteController
             }
             $resultData[$url][$dateStart] = $sum;
         }
-        var_dump($resultData);
         return $resultData;
     }
 
