@@ -75,7 +75,7 @@ class Parser
     private function saveSiteData($data, $site)
     {
         foreach ($data as $key => $item) {
-            if (!empty($site->data[$key])) {
+            if (isset($site->data[$key])) {
                 if ($item['prosmotr'] > $site->data[$key]['prosmotr'] || $item['posetit'] > $site->data[$key]['posetit']) {
                     $stmt = $this->_db->prepare('UPDATE sites_data SET prosmotr = ?, posetit = ? WHERE site_id = ? AND `date` = ?');
                     $stmt->execute([$item['prosmotr'], $item['posetit'], $site->id, $key]);
