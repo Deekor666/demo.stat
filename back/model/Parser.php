@@ -77,8 +77,8 @@ class Parser
         foreach ($data as $key => $item) {
             if (!empty($site->data[$key])) {
                 if ($item['prosmotr'] > $site->data[$key]['prosmotr'] || $item['posetit'] > $site->data[$key]['posetit']) {
-                    $stmt = $this->_db->prepare('UPDATE sites_data SET prosmotr = ?, posetit = ? WHERE site_id = ?');
-                    $stmt->execute([$item['prosmotr'], $item['posetit'], $site->id]);
+                    $stmt = $this->_db->prepare('UPDATE sites_data SET prosmotr = ?, posetit = ? WHERE site_id = ? AND `date` = ?');
+                    $stmt->execute([$item['prosmotr'], $item['posetit'], $site->id, $key]);
                 }
             } else {
                 $stmt = $this->_db->prepare('INSERT INTO sites_data (site_id, `date`, prosmotr, posetit) VALUES (? , ? , ?, ?)');
